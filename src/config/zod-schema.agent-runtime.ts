@@ -154,7 +154,7 @@ export const HeartbeatSchema = z
   })
   .optional();
 
-const SandboxDockerSchema = z
+export const SandboxDockerSchema = z
   .object({
     image: z.string().optional(),
     containerPrefix: z.string().optional(),
@@ -244,7 +244,7 @@ const SandboxDockerSchema = z
   })
   .optional();
 
-const SandboxBrowserSchema = z
+export const SandboxBrowserSchema = z
   .object({
     enabled: z.boolean().optional(),
     image: z.string().optional(),
@@ -275,7 +275,7 @@ const SandboxBrowserSchema = z
   .strict()
   .optional();
 
-const SandboxPruneSchema = z
+export const SandboxPruneSchema = z
   .object({
     idleHours: z.number().int().nonnegative().optional(),
     maxAgeDays: z.number().int().nonnegative().optional(),
@@ -643,7 +643,7 @@ const SwarmSchema = z
   ])
   .optional();
 
-const SandboxSshSchema = z
+export const SandboxSshSchema = z
   .object({
     target: z.string().min(1).optional(),
     command: z.string().min(1).optional(),
