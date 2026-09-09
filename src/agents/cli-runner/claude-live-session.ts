@@ -135,6 +135,11 @@ export function resetClaudeLiveSessionsForTest(): void {
   liveSessionCreates.clear();
 }
 
+/** Returns managed-run identities for live-session continuity assertions. */
+export function getClaudeLiveSessionRunIdsForTest(): string[] {
+  return [...liveSessions.values()].map((session) => session.managedRun.runId).toSorted();
+}
+
 async function waitForManagedRunExit(managedRun: ManagedRun): Promise<void> {
   let timeout: NodeJS.Timeout | null = null;
   try {
