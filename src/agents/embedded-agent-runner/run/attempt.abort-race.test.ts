@@ -108,4 +108,42 @@ describe("runEmbeddedAttempt abort races", () => {
       status: "timeout",
     });
   });
+
+  it("does not create attempt resources when aborted during paired-computer discovery", async () => {
+    const discovery = createDeferred();
+    const abortController = new AbortController();
+    const reason = new Error("aborted during paired-computer discovery");
+    hoisted.loadPairedComputerUseAvailabilityForSurfaceMock.mockReturnValue(discovery.promise);
+
+    const attempt = createContextEngineAttemptRunner({
+      contextEngine: createContextEngineBootstrapAndAssemble(),
+      sessionKey: "agent:main:triage:deferred-computer",
+      tempPaths,
+      sessionPrompt: async () => {},
+      attemptOverrides: {
+        abortSignal: abortController.signal,
+        config: { tools: { codeMode: true } },
+        disableTools: false,
+        forceCodeModeTools: true,
+        sessionTarget: {
+          agentId: "main",
+          expectedWriterRunId: "run-context-engine-forwarding",
+          sessionId: "embedded-session",
+          sessionKey: "agent:main:triage:deferred-computer",
+          storePath: "/tmp/openclaw-unused-aborted-transcript.sqlite",
+        },
+      },
+    });
+
+    await vi.waitFor(() =>
+      expect(hoisted.loadPairedComputerUseAvailabilityForSurfaceMock).toHaveBeenCalledTimes(1),
+    );
+    abortController.abort(reason);
+    discovery.resolve();
+
+    await expect(attempt).rejects.toBe(reason);
+    expect(hoisted.createOpenClawCodingToolsMock).not.toHaveBeenCalled();
+    expect(hoisted.createAgentSessionMock).not.toHaveBeenCalled();
+    expect(hoisted.bindCodeModeTranscriptAuthorityMock).not.toHaveBeenCalled();
+  });
 });
