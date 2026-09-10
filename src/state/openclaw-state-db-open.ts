@@ -86,7 +86,9 @@ export function openUnpublishedStateDatabase(params: {
         return maintenance;
       } catch (error) {
         maintenance?.close();
-        db.close();
+        if (db.isOpen) {
+          db.close();
+        }
         if (
           error instanceof Error &&
           (isSqliteSchemaVersionError(error) || isTerminalSqliteIntegrityError(error))
